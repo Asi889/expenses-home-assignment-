@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { api, Expense, ExpenseCategory, ExpenseFilter, DocumentType } from '@/lib/api';
+import { api, Expense, ExpenseCategory, ExpenseFilter, DocumentType, API_BASE_URL } from '@/lib/api';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'upload' | 'expenses'>('upload');
@@ -584,7 +584,7 @@ export default function DashboardPage() {
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                               {expense.fileName ? (
                                 <a 
-                                  href={`http://localhost:5000/api/uploads/${expense.fileName}`} 
+                                  href={`${API_BASE_URL}/uploads/${expense.fileName}`} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="text-blue-600 hover:text-blue-900 font-medium"
