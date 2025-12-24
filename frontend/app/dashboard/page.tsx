@@ -13,6 +13,18 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [highlightExpenses, setHighlightExpenses] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Load dark mode preference
+  useEffect(() => {
+    const saved = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(saved);
+  }, []);
+
+  // Save dark mode preference
+  useEffect(() => {
+    localStorage.setItem('darkMode', isDarkMode.toString());
+  }, [isDarkMode]);
   
   // Auto-clear success message after 3 seconds (toast behavior)
   useEffect(() => {
@@ -216,16 +228,32 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow">
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-[#0a0a0a]' : 'bg-gray-50'}`}>
+      <div className={`${isDarkMode ? 'bg-[#1a1a1a] border-b border-gray-800 shadow-xl' : 'bg-white shadow'}`}>
         <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className=" max-w-7xl flex justify-between items-center py-4 mx-auto">
-            <h1 className="text-2xl font-bold text-black">מערכת ניהול הוצאות</h1>
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-bold text-black">{user?.email}</span>
+            <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-black'}`}>מערכת ניהול הוצאות</h1>
+            <div className="flex items-center gap-6">
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className={`p-2 rounded-full transition-colors ${isDarkMode ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                title={isDarkMode ? 'מצב יום' : 'מצב לילה'}
+              >
+                {isDarkMode ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                )}
+              </button>
+              <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-black'}`}>{user?.email}</span>
               <button
                 onClick={logout}
-                className="text-sm text-blue-600 hover:text-blue-500"
+                className={`text-sm font-bold ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'}`}
               >
                 התנתק
               </button>
@@ -235,15 +263,15 @@ export default function DashboardPage() {
       </div>
 
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow">
-          <div className="border-b border-gray-200">
+        <div className={`rounded-lg shadow-xl overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-[#1a1a1a] border border-gray-800' : 'bg-white'}`}>
+          <div className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
             <nav className="flex">
               <button
                 onClick={() => setActiveTab('upload')}
                 className={`px-6 py-4 text-sm font-bold transition-all duration-100 transform hover:scale-110 active:scale-95 ${
                   activeTab === 'upload'
-                    ? 'border-b-2 border-blue-600 text-blue-700 bg-blue-50/50 rounded-t-lg'
-                    : 'text-black hover:text-blue-600 hover:rotate-1'
+                    ? `border-b-2 border-blue-600 ${isDarkMode ? 'text-blue-400 bg-blue-900/20' : 'text-blue-700 bg-blue-50/50'}`
+                    : `${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-black hover:text-blue-600'}`
                 }`}
               >
                 העלאת חשבוניות
@@ -256,8 +284,8 @@ export default function DashboardPage() {
                     : ''
                 } ${
                   activeTab === 'expenses'
-                    ? 'border-b-2 border-blue-600 text-blue-700 shadow-[0_4px_20px_-5px_rgba(37,99,235,0.4)] bg-blue-50/50 rounded-t-lg'
-                    : 'text-black hover:text-blue-600 hover:-rotate-1'
+                    ? `border-b-2 border-blue-600 shadow-[0_4px_20px_-5px_rgba(37,99,235,0.4)] ${isDarkMode ? 'text-blue-400 bg-blue-900/20' : 'text-blue-700 bg-blue-50/50'}`
+                    : `${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-black hover:text-blue-600'}`
                 }`}
               >
                 <span className={`inline-block`}>
@@ -271,7 +299,7 @@ export default function DashboardPage() {
 
           <div className="p-6">
             {error && (
-              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              <div className={`mb-4 px-4 py-3 rounded border ${isDarkMode ? 'bg-red-900/20 border-red-800 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`}>
                 {error}
               </div>
             )}
@@ -290,14 +318,14 @@ export default function DashboardPage() {
 
             {activeTab === 'upload' && (
               <div className="space-y-4">
-                <h2 className="text-xl font-bold text-black">העלאת חשבונית/קבלה</h2>
-                <p className="text-sm font-medium text-black">
+                <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-black'}`}>העלאת חשבונית/קבלה</h2>
+                <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-black'}`}>
                   העלה קובץ PDF או תמונה לניתוח אוטומטי. סוג המסמך (חשבונית/קבלה) יזוהה אוטומטית
                 </p>
                 
                 {/* File Upload */}
                 <div>
-                  <label className="block text-sm font-bold text-black mb-2">
+                  <label className={`block text-sm font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>
                     בחר קובץ
                   </label>
                   <input
@@ -305,10 +333,14 @@ export default function DashboardPage() {
                     accept=".pdf,.jpg,.jpeg,.png"
                     onChange={handleFileUpload}
                     disabled={uploading}
-                    className="block w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    className={`block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold ${
+                      isDarkMode 
+                        ? 'text-gray-300 file:bg-gray-800 file:text-blue-400 hover:file:bg-gray-700' 
+                        : 'text-black file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'
+                    }`}
                   />
                   {uploading && (
-                    <p className="mt-2 text-sm font-bold text-black">מעבד את הקובץ...</p>
+                    <p className={`mt-2 text-sm font-bold ${isDarkMode ? 'text-blue-400' : 'text-black'}`}>מעבד את הקובץ...</p>
                   )}
                 </div>
               </div>
@@ -316,32 +348,40 @@ export default function DashboardPage() {
 
             {activeTab === 'expenses' && (
               <div className="space-y-4">
-                <h2 className="text-xl font-bold text-black">ניהול הוצאות</h2>
+                <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-black'}`}>ניהול הוצאות</h2>
                 
                 {/* Filters */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-4 bg-gray-50 rounded-lg">
+                <div className={`grid grid-cols-1 md:grid-cols-4 gap-6 p-4 rounded-lg transition-colors duration-300 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
                   {/* Date Filters Stacked */}
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-bold text-black mb-1">
+                      <label className={`block text-xs font-bold mb-1 ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                         מתאריך
                       </label>
                       <input
                         type="date"
                         value={filters.startDate || ''}
                         onChange={(e) => setFilters({ ...filters, startDate: e.target.value || undefined })}
-                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-black"
+                        className={`w-full px-3 py-1.5 border rounded-md text-sm transition-colors ${
+                          isDarkMode 
+                            ? 'bg-[#0a0a0a] border-gray-700 text-white' 
+                            : 'bg-white border-gray-300 text-black'
+                        }`}
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-black mb-1">
+                      <label className={`block text-xs font-bold mb-1 ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                         עד תאריך
                       </label>
                       <input
                         type="date"
                         value={filters.endDate || ''}
                         onChange={(e) => setFilters({ ...filters, endDate: e.target.value || undefined })}
-                        className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-black"
+                        className={`w-full px-3 py-1.5 border rounded-md text-sm transition-colors ${
+                          isDarkMode 
+                            ? 'bg-[#0a0a0a] border-gray-700 text-white' 
+                            : 'bg-white border-gray-300 text-black'
+                        }`}
                       />
                     </div>
                   </div>
@@ -349,33 +389,41 @@ export default function DashboardPage() {
                   {/* Amount Filters Stacked */}
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-bold text-black mb-1">
+                      <label className={`block text-xs font-bold mb-1 ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                         סכום מינימלי
                       </label>
                       <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-black text-sm">₪</span>
+                        <span className={`absolute inset-y-0 left-0 pl-3 flex items-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-black'}`}>₪</span>
                         <input
                           type="number"
                           step="0.01"
                           value={filters.minAmount || ''}
                           onChange={(e) => setFilters({ ...filters, minAmount: e.target.value ? parseFloat(e.target.value) : undefined })}
-                          className="w-full pl-7 pr-3 py-1.5 border border-gray-300 rounded-md text-sm text-black"
+                          className={`w-full pl-7 pr-3 py-1.5 border rounded-md text-sm transition-colors ${
+                            isDarkMode 
+                              ? 'bg-[#0a0a0a] border-gray-700 text-white' 
+                              : 'bg-white border-gray-300 text-black'
+                          }`}
                           placeholder="0.00"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-black mb-1">
+                      <label className={`block text-xs font-bold mb-1 ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                         סכום מקסימלי
                       </label>
                       <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-black text-sm">₪</span>
+                        <span className={`absolute inset-y-0 left-0 pl-3 flex items-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-black'}`}>₪</span>
                         <input
                           type="number"
                           step="0.01"
                           value={filters.maxAmount || ''}
                           onChange={(e) => setFilters({ ...filters, maxAmount: e.target.value ? parseFloat(e.target.value) : undefined })}
-                          className="w-full pl-7 pr-3 py-1.5 border border-gray-300 rounded-md text-sm text-black"
+                          className={`w-full pl-7 pr-3 py-1.5 border rounded-md text-sm transition-colors ${
+                            isDarkMode 
+                              ? 'bg-[#0a0a0a] border-gray-700 text-white' 
+                              : 'bg-white border-gray-300 text-black'
+                          }`}
                           placeholder="0.00"
                         />
                       </div>
@@ -384,27 +432,35 @@ export default function DashboardPage() {
 
                   {/* Business Name */}
                   <div className="flex flex-col justify-start">
-                    <label className="block text-xs font-bold text-black mb-1">
+                    <label className={`block text-xs font-bold mb-1 ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                       שם עסק
                     </label>
                     <input
                       type="text"
                       value={filters.businessName || ''}
                       onChange={(e) => setFilters({ ...filters, businessName: e.target.value || undefined })}
-                      className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-black h-[38px]"
+                      className={`w-full px-3 py-1.5 border rounded-md text-sm transition-colors h-[38px] ${
+                        isDarkMode 
+                          ? 'bg-[#0a0a0a] border-gray-700 text-white placeholder-gray-500' 
+                          : 'bg-white border-gray-300 text-black placeholder-gray-400'
+                      }`}
                       placeholder="חפש עסק..."
                     />
                   </div>
 
                   {/* Category */}
                   <div className="flex flex-col justify-start">
-                    <label className="block text-xs font-bold text-black mb-1">
+                    <label className={`block text-xs font-bold mb-1 ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                       קטגוריה
                     </label>
                     <select
                       value={filters.category !== undefined ? filters.category : ''}
                       onChange={(e) => setFilters({ ...filters, category: e.target.value ? parseInt(e.target.value) as ExpenseCategory : undefined })}
-                      className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm text-black bg-white h-[38px]"
+                      className={`w-full px-3 py-1.5 border rounded-md text-sm transition-colors h-[38px] ${
+                        isDarkMode 
+                          ? 'bg-[#0a0a0a] border-gray-700 text-white' 
+                          : 'bg-white border-gray-300 text-black'
+                      }`}
                     >
                       <option value="">הכל</option>
                       {Object.entries(categoryLabels).map(([key, label]) => (
@@ -418,7 +474,7 @@ export default function DashboardPage() {
                 <div className="flex justify-end">
                   <button
                     onClick={clearFilters}
-                    className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                    className={`flex items-center gap-2 text-sm font-bold transition-colors ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -429,49 +485,49 @@ export default function DashboardPage() {
 
                 {/* Expenses Table */}
                 {loading ? (
-                  <p className="text-center text-black font-bold py-8">טוען...</p>
+                  <p className={`text-center font-bold py-8 ${isDarkMode ? 'text-white' : 'text-black'}`}>טוען...</p>
                 ) : expenses.length === 0 ? (
-                  <p className="text-center text-black font-bold py-8">אין הוצאות להצגה</p>
+                  <p className={`text-center font-bold py-8 ${isDarkMode ? 'text-white' : 'text-black'}`}>אין הוצאות להצגה</p>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-100">
+                    <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
+                      <thead className={`${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100'}`}>
                         <tr>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             שם עסק
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             ח״פ / עוסק מורשה
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             תאריך
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             לפני מע״מ
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             אחרי מע״מ
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             מספר חשבונית
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             סוג מסמך
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             קטגוריה
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             מסמך
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-black uppercase tracking-wider">
+                          <th className={`px-6 py-3 text-right text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>
                             פעולות
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className={`divide-y transition-colors duration-300 ${isDarkMode ? 'bg-[#1a1a1a] divide-gray-800' : 'bg-white divide-gray-200'}`}>
                         {expenses.map((expense) => {
-                          // Calculate document type once per expense
+                          // ... same logic for docType and formattedDate ...
                           let docType: DocumentType = DocumentType.Receipt;
                           if (expense.documentType !== undefined && expense.documentType !== null) {
                             if (typeof expense.documentType === 'number') {
@@ -485,40 +541,34 @@ export default function DashboardPage() {
                             docType = expense.isReceipt ? DocumentType.Receipt : DocumentType.TaxInvoice;
                           }
 
-                          // Format date once per expense
                           const date = new Date(expense.transactionDate);
                           const formattedDate = `${String(date.getUTCDate()).padStart(2, '0')}/${String(date.getUTCMonth() + 1).padStart(2, '0')}/${date.getUTCFullYear()}`;
 
                           return (
-                            <tr key={expense.id} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
+                            <tr key={expense.id} className={`transition-colors ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}>
+                              <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-black'}`}>
                                 {expense.businessName}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
+                              <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-black'}`}>
                                 {expense.taxId || '-'}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
+                              <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-black'}`}>
                                 {formattedDate}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
+                              <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-black'}`}>
                                 ₪{expense.amountBeforeVat.toFixed(2)}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-black font-semibold">
+                              <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-black'}`}>
                                 ₪{expense.amountAfterVat.toFixed(2)}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
+                              <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-black'}`}>
                                 {expense.invoiceNumber || '-'}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
+                              <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-200' : 'text-black'}`}>
                                 {(() => {
-                                  // Display all 3 types in Hebrew
-                                  if (docType === DocumentType.TaxInvoiceReceipt) {
-                                    return 'חשבונית מס קבלה';
-                                  } else if (docType === DocumentType.TaxInvoice) {
-                                    return 'חשבונית מס';
-                                  } else {
-                                    return 'קבלה';
-                                  }
+                                  if (docType === DocumentType.TaxInvoiceReceipt) return 'חשבונית מס קבלה';
+                                  if (docType === DocumentType.TaxInvoice) return 'חשבונית מס';
+                                  return 'קבלה';
                                 })()}
                               </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -530,11 +580,10 @@ export default function DashboardPage() {
                                     if (typeof expense.category === 'number' && !isNaN(expense.category)) {
                                       categoryValue = expense.category;
                                     } else if (typeof expense.category === 'string') {
-                                      const parsed = parseInt(expense.category, 10);
+                                      const parsed = parseInt(expense.category as string, 10);
                                       categoryValue = isNaN(parsed) ? ExpenseCategory.Other : parsed;
                                     }
                                   }
-                                  // Ensure it's a valid enum value
                                   if (!Object.values(ExpenseCategory).includes(categoryValue as ExpenseCategory)) {
                                     categoryValue = ExpenseCategory.Other;
                                   }
@@ -544,28 +593,22 @@ export default function DashboardPage() {
                                   e.stopPropagation();
                                   const newCategory = parseInt(e.target.value, 10) as ExpenseCategory;
                                   const currentCategory = (() => {
-                                    let cat = expense.category;
+                                    const cat = expense.category as unknown;
                                     if (cat === undefined || cat === null) return ExpenseCategory.Other;
-                                    if (typeof cat === 'string') cat = parseInt(cat, 10);
-                                    if (isNaN(cat as number)) return ExpenseCategory.Other;
+                                    if (typeof cat === 'string') return (parseInt(cat, 10) as ExpenseCategory) || ExpenseCategory.Other;
+                                    if (typeof cat === 'number' && isNaN(cat)) return ExpenseCategory.Other;
                                     return Number(cat) as ExpenseCategory;
                                   })();
                                   
-                                  console.log('Select onChange triggered:', {
-                                    selectedValue: e.target.value,
-                                    newCategory,
-                                    currentCategory,
-                                    expenseId: expense.id,
-                                    expenseCategoryRaw: expense.category
-                                  });
-                                  
                                   if (!isNaN(newCategory) && newCategory !== currentCategory) {
                                     await handleCategoryChange(expense.id, newCategory);
-                                  } else {
-                                    console.log('Skipping update - same category or invalid value');
                                   }
                                 }}
-                                className="border border-gray-300 rounded-md px-2 py-1 text-sm text-black bg-white cursor-pointer"
+                                className={`border rounded-md px-2 py-1 text-sm cursor-pointer transition-colors ${
+                                  isDarkMode 
+                                    ? 'bg-[#0a0a0a] border-gray-700 text-white' 
+                                    : 'bg-white border-gray-300 text-black'
+                                }`}
                               >
                                 {[
                                   ExpenseCategory.Vehicle,
@@ -587,7 +630,7 @@ export default function DashboardPage() {
                                   href={`${API_BASE_URL}/uploads/${expense.fileName}`} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-900 font-medium"
+                                  className={`font-medium transition-colors ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}
                                 >
                                   צפה
                                 </a>
@@ -598,7 +641,7 @@ export default function DashboardPage() {
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                               <button
                                 onClick={() => handleDelete(expense.id)}
-                                className="text-red-600 hover:text-red-900"
+                                className={`transition-colors ${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
                               >
                                 מחק
                               </button>

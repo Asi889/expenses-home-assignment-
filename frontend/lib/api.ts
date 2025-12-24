@@ -90,7 +90,7 @@ class ApiClient {
 
     // Handle 204 No Content (empty response)
     if (response.status === 204 || response.statusText === 'No Content') {
-      return undefined as any;
+      return {} as T;
     }
 
     // Check if response has content
@@ -98,12 +98,12 @@ class ApiClient {
     if (contentType && contentType.includes('application/json')) {
       const text = await response.text();
       if (text.trim() === '') {
-        return undefined as any;
+        return {} as T;
       }
       return JSON.parse(text);
     }
 
-    return undefined as any;
+    return {} as T;
   }
 
   async register(data: RegisterRequest): Promise<AuthResponse> {
@@ -116,7 +116,7 @@ class ApiClient {
       localStorage.setItem('authToken', result.token);
     }
     
-    return result;
+    return result as AuthResponse;
   }
 
   async login(data: LoginRequest): Promise<AuthResponse> {
@@ -129,14 +129,14 @@ class ApiClient {
       localStorage.setItem('authToken', result.token);
     }
 
-    return result;
+    return result as AuthResponse;
   }
 
   async getCurrentUser() {
     return this.request<{ id: number; email: string }>('/auth/me');
   }
 
-  async uploadInvoice(file: File): Promise<{ expense: Expense; analysis: any }> {
+  async uploadInvoice(file: File): Promise<{ expense: Expense; analysis: Record<string, unknown> }> {
     const formData = new FormData();
     formData.append('file', file);
     // Document type will be detected automatically by OCR
@@ -161,7 +161,7 @@ class ApiClient {
       throw new Error(error.message || 'Upload failed');
     }
 
-    return response.json();
+    return response.json() as Promise<{ expense: Expense; analysis: Record<string, unknown> }>;
   }
 
   async getExpenses(filter?: ExpenseFilter): Promise<Expense[]> {
