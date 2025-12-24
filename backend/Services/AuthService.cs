@@ -68,9 +68,13 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(User user)
     {
-        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!");
-        var issuer = _configuration["Jwt:Issuer"] ?? "InvoiceExpenseSystem";
-        var audience = _configuration["Jwt:Audience"] ?? "InvoiceExpenseSystem";
+        var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") 
+            ?? _configuration["Jwt:Key"] 
+            ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!123gokumeetssuperman";
+            
+        var key = Encoding.UTF8.GetBytes(jwtKey);
+        var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _configuration["Jwt:Issuer"] ?? "InvoiceExpenseSystem";
+        var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? _configuration["Jwt:Audience"] ?? "InvoiceExpenseSystem";
 
         var claims = new[]
         {
