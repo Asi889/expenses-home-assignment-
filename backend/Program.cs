@@ -98,7 +98,21 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://expenses-home-assignment.onrender.com")
+        var allowedOrigins = new List<string> 
+        { 
+            "http://localhost:3000", 
+            "https://expenses-home-assignment.onrender.com",
+            "https://expenses-home-assignment-1.onrender.com" // Added this one
+        };
+        
+        // Also allow adding an origin via environment variable for flexibility
+        var envOrigin = Environment.GetEnvironmentVariable("FRONTEND_URL");
+        if (!string.IsNullOrEmpty(envOrigin))
+        {
+            allowedOrigins.Add(envOrigin);
+        }
+
+        policy.WithOrigins(allowedOrigins.ToArray())
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
