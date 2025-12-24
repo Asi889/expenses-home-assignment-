@@ -12,9 +12,6 @@ Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure to use HTTP only (no HTTPS) to avoid redirect issues
-builder.WebHost.UseUrls("http://localhost:5000");
-
 // Add services to the container
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -28,6 +25,18 @@ builder.Services.AddSwaggerGen();
 // Database - read from environment variable or config
 var dbConnectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") 
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(dbConnectionString))
+{
+    Console.WriteLine("⚠ WARNING: Database connection string is empty!");
+}
+else
+{
+    // Log a masked version for debugging
+    var maskedConnectionString = Regex.Replace(dbConnectionString, @"Password=[^;]+", "Password=****");
+    Console.WriteLine($"ℹ Using connection string: {maskedConnectionString}");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(dbConnectionString));
 
