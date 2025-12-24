@@ -8,34 +8,23 @@ using InvoiceExpenseSystem.Data;
 using InvoiceExpenseSystem.Services;
 using DotNetEnv;
 
-// Load environment variables from .env file
+// Load environment variables from .env file (if it exists)
 Env.Load();
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        // Serialize enums as strings instead of numbers
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-    });
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// Database - read from environment variable or config
-var dbConnectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") 
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+// Production Priority: Use Render's environment variables if available
+var dbConnectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
 
 if (string.IsNullOrEmpty(dbConnectionString))
 {
-    Console.WriteLine("⚠ WARNING: Database connection string is empty!");
+    // Fallback to local config only if Render variable is missing
+    dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    Console.WriteLine("ℹ Using fallback/local connection string");
 }
 else
 {
-    // Log a masked version for debugging
+    // Log a masked version for debugging to confirm we are using the Render variable
     var maskedConnectionString = Regex.Replace(dbConnectionString, @"Password=[^;]+", "Password=****");
-    Console.WriteLine($"ℹ Using connection string: {maskedConnectionString}");
+    Console.WriteLine($"ℹ Using PRODUCTION connection string: {maskedConnectionString}");
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
