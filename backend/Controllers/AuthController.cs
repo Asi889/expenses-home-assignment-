@@ -68,12 +68,15 @@ public class AuthController : ControllerBase
 
     private void SetTokenCookie(string token)
     {
+        var isProduction = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production";
+
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true, // Prevents JavaScript access (XSS protection)
-            Secure = false, // Set to true in production with HTTPS
-            SameSite = SameSiteMode.Lax, // CSRF protection
-            Expires = DateTimeOffset.UtcNow.AddDays(7) // Same as JWT expiration
+            Secure = true,   // Must be true for SameSite=None to work
+            SameSite = isProduction ? SameSiteMode.None : SameSiteMode.Lax, // None for cross-site in production
+            Expires = DateTimeOffset.UtcNow.AddDays(7), // Same as JWT expiration
+            Path = "/"
         };
 
         Response.Cookies.Append("authToken", token, cookieOptions);
