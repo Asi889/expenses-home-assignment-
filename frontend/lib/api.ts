@@ -141,9 +141,18 @@ class ApiClient {
     formData.append('file', file);
     // Document type will be detected automatically by OCR
 
+    const headers: Record<string, string> = {};
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
     const response = await fetch(`${API_BASE_URL}/invoice/upload`, {
       method: 'POST',
       credentials: 'include', // Include cookies
+      headers,
       body: formData,
     });
 
