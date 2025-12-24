@@ -54,7 +54,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // JWT Authentication - read from environment variables or config
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") 
     ?? builder.Configuration["Jwt:Key"] 
-    ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!";
+    ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!123gokumeetssuperman";
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
     ?? builder.Configuration["Jwt:Issuer"] 
     ?? "InvoiceExpenseSystem";

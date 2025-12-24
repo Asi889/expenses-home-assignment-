@@ -35,7 +35,11 @@ public class AuthController : ControllerBase
         // Set JWT token in httpOnly cookie
         SetTokenCookie(result.Token);
 
-        return Ok(new { email = result.Email, message = "Registration successful" });
+        return Ok(new { 
+            email = result.Email, 
+            token = result.Token, // Return token in body as backup
+            message = "Registration successful" 
+        });
     }
 
     [HttpPost("login")]
@@ -55,7 +59,11 @@ public class AuthController : ControllerBase
         // Set JWT token in httpOnly cookie
         SetTokenCookie(result.Token);
 
-        return Ok(new { email = result.Email, message = "Login successful" });
+        return Ok(new { 
+            email = result.Email, 
+            token = result.Token, // Return token in body as backup
+            message = "Login successful" 
+        });
     }
 
     [HttpPost("logout")]

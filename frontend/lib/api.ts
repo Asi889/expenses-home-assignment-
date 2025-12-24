@@ -64,6 +64,14 @@ class ApiClient {
       ...(options.headers as Record<string, string>),
     };
 
+    // Add Authorization header if token exists in localStorage
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
     // Remove Content-Type for FormData requests
     if (options.body instanceof FormData) {
       delete headers['Content-Type'];
@@ -99,17 +107,29 @@ class ApiClient {
   }
 
   async register(data: RegisterRequest): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/auth/register', {
+    const result = await this.request<AuthResponse & { token: string }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    
+    if (result && result.token) {
+      localStorage.setItem('authToken', result.token);
+    }
+    
+    return result;
   }
 
   async login(data: LoginRequest): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/auth/login', {
+    const result = await this.request<AuthResponse & { token: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+
+    if (result && result.token) {
+      localStorage.setItem('authToken', result.token);
+    }
+
+    return result;
   }
 
   async getCurrentUser() {
@@ -151,6 +171,9 @@ class ApiClient {
   }
 
   async logout(): Promise<void> {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken');
+    }
     return this.request<void>('/auth/logout', {
       method: 'POST',
     });
